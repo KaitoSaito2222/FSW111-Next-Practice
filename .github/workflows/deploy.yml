@@ -17,8 +17,8 @@ jobs:
       
       - name: Build and push
         run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest
+          docker build -t ghcr.io/kaitosaito2222/fsw111-next-practice:latest .
+          docker push ghcr.io/kaitosaito2222/fsw111-next-practice:latest
       
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
@@ -28,6 +28,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            sudo docker pull ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest
+            sudo docker pull ghcr.io/kaitosaito2222/fsw111-next-practice:latest
             sudo docker stop fsw111-next-practice || true && sudo docker rm fsw111-next-practice || true
-            sudo docker run -d --name fsw111-next-practice -p 80:3000 ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest
+            sudo docker run -d --name fsw111-next-practice -p 80:3000 ghcr.io/kaitosaito2222/fsw111-next-practice:latest
