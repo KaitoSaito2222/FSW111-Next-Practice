@@ -1,0 +1,25 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/my-next-app
+            git pull
+            sudo docker build -t my-next-app .
+            sudo docker stop my-next-app || true
+            sudo docker rm my-next-app || true
+            sudo docker run -d --name my-next-app -p 80:3000 my-next-app
