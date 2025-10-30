@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/my-next-app
+            cd ~/FSW111-Next-Practice
             git pull
             sudo docker build -t my-next-app .
             sudo docker stop my-next-app || true
