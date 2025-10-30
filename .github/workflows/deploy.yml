@@ -6,10 +6,20 @@ on:
       - main
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: actions/checkout@v3
+      
+      - name: Login to GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
+      - name: Build and push
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest
+      
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -17,9 +27,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/FSW111-Next-Practice
-            git pull
-            sudo docker build -t my-next-app .
-            sudo docker stop my-next-app || true
-            sudo docker rm my-next-app || true
-            sudo docker run -d --name my-next-app -p 80:3000 my-next-app
+            echo ${{ secrets.GITHUB_TOKEN }} | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            sudo docker pull ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest
+            sudo docker stop fsw111-next-practice || true && sudo docker rm fsw111-next-practice || true
+            sudo docker run -d --name fsw111-next-practice -p 80:3000 ghcr.io/${{ github.repository_owner }}/fsw111-next-practice:latest
